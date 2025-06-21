@@ -53,9 +53,6 @@ $items_result = $item_stmt->get_result();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($item = $items_result->fetch_assoc()): ?>
-                        <?php echo "<pre>"; print_r($item); echo "</pre>"; ?>
-                    <?php endwhile; ?>
                         <?php while ($item = $items_result->fetch_assoc()): ?>
                             <tr class="border border-gray-400">
                                 <td class="text-left px-4 sm:px-5 py-4 sm:py-5 border-r border-gray-400 font-normal">

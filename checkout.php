@@ -64,27 +64,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Suburb, $City, $Zip, $State, $Phone, $Email, 
     $total_quantity, $cart_subtotal, $cart_total, $status, $Delivery,$date);
 
-        $stmt->execute(); 
-        foreach ($_SESSION['cart'] as $product_id => $item) {
-            if (is_array($item) && isset($item['price']) && isset($item['quantity']) && isset($item['name'])) {
-                $price = cleanPrice($item['price']);
-                $quantity = intval($item['quantity']);
-                $total_price = $price * $quantity;
-                $product_name = $item['name'];
-                      
-                $item_stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, quantity, price, total_price) VALUES (?, ?, ?, ?, ?, ?)");
-                $product_id = intval($product_id);
-                $item_stmt->bind_param("iisiid", $order_id, $product_id, $product_name, $quantity, $price, $total_price);
-                $item_stmt->execute();
-                $item_stmt->close();
-            }
+        if ($stmt->execute()) {
+        $order_id = $conn->insert_id;
+
+    foreach ($_SESSION['cart'] as $product_id => $item) {
+        if (is_array($item) && isset($item['price']) && isset($item['quantity']) && isset($item['name'])) {
+            $price = cleanPrice($item['price']);
+            $quantity = intval($item['quantity']);
+            $total_price = $price * $quantity;
+            $product_name = $item['name'];
+
+            $item_stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, quantity, price, total_price) VALUES (?, ?, ?, ?, ?, ?)");
+            $product_id = intval($product_id);
+            $item_stmt->bind_param("iisiid", $order_id, $product_id, $product_name, $quantity, $price, $total_price);
+            $item_stmt->execute();
+            $item_stmt->close();
         }
-    if ($stmt->execute()) {
-      $_SESSION['last_order_id'] = $conn->insert_id; 
-      $_SESSION['cart'] = [];
-      header('Location: thankyou.php');
-      exit();
-  }
+    }
+
+    $_SESSION['last_order_id'] = $order_id;
+    $_SESSION['cart'] = [];
+    header('Location: thankyou.php');
+    exit();
+}
 }
 ?>
 
